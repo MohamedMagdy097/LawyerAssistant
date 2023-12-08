@@ -2,11 +2,10 @@ import OpenAI from "openai";
 import { config } from "dotenv";
 config();
 
-import fs, { futimes } from "fs";
+import fs from "fs";
 import express from 'express';
 const app = express();
 import cors from "cors";
-import { Console } from "console";
 const openai = new OpenAI();
 
 app.use(express.urlencoded({ extended: true }));
@@ -14,14 +13,10 @@ app.use(express.json());
 app.use(cors());
 
 const assistantId = 'asst_doz8twF3Zg9vAqZxNtFaRZyP';
+
 const inst = "You are a lawyer assistant. when asked a question answer as a lawyers assistant.";
+var fileIds = ['file-i7ZXjwbamadWyc2qTtVUaeLa'];
 
-
-const testThreadId = 'thread_UAfhTp83v4gI4AsE7pIevtuG';
-const testRunId = 'run_AEpKIN4EXvHgLJHDmh8H3odE';
-const testMsgId = 'msg_GGGfWkCA98HOnnWXk4biPI9I';
-const testStepId = 'step_u6W8UejZTvZcLPV0LH5L5XBE';
-const testFileId = 'file-3ydXFiKbRIRrB4bx1mSHDbFO';
 
 // https://platform.openai.com/docs/api-reference/assistants/file-object?lang=node.js
 //CRUD
@@ -55,15 +50,18 @@ async function ListAssistants() {
   console.log(myAssistants.data);
 }
 
-async function UpdateAssistant(ID, instructions, name) {
+async function UpdateAssistant(ID, instructions, name, fileId) {
+  if (fileId != null) {
+    fileIds.push(fileId);
+  }
   const myUpdatedAssistant = await openai.beta.assistants.update(
     ID,
     {
       instructions: instructions,
       name: name,
-      tools: [{ type: "retrieval" }, { type: "code_interpreter" }],
+      tools: [{ type: "retrieval" }],
       model: "gpt-3.5-turbo-1106",
-      file_ids: [testFileId],
+      file_ids: fileIds,
     }
   );
   console.log(myUpdatedAssistant);
@@ -137,13 +135,11 @@ async function createThread() {
 
 // Read a thread
 async function readThread(threadId) {
-  async function main() {
-    const myThread = await openai.beta.threads.retrieve(
-      threadId
-    );
-  
-    console.log(myThread);
-  }
+  const myThread = await openai.beta.threads.retrieve(
+    threadId
+  );
+
+  console.log(myThread);    
 }
 
 // Update a thread VIP ATTACH THREAD TO USER TEST
@@ -191,8 +187,8 @@ async function readMessage(threadId, msgId) {
   return message.content[0].text.value;
 }
 
-// Update a Message
-async function main(threadId, msgId) {
+// Update a Message x
+async function updateMessage(threadId, msgId) {
   const message = await openai.beta.threads.messages.update(
     threadId,
     msgId,
@@ -211,8 +207,12 @@ async function listMessages(threadId) {
     threadId
   );
   // loop the array of data[i] ex: threadMessages.data[i].content[0].text.value;
-  console.log(threadMessages.data);
-  return threadMessages.data;
+  // for(let i = 0; i < threadMessages.data.length; i++) {
+  //   console.log(threadMessages.data[i].content[0].text.value);
+  // }
+  // console.log(threadMessages.body.first_id);
+  // readMessage(threadId, threadMessages.body.first_id);
+  return threadMessages;
 }
 
 //
@@ -323,70 +323,57 @@ async function listSteps(threadId, runId) {
 //
 // APP
 //
-
 // After Uploading a file copy its id from logs
 // uploadFile('filename.txt');
 // fileToAssistant('file-i7ZXjwbamadWyc2qTtVUaeLa', assistantId);
 
-// Get all step ids from listSteps
-function getStepIds(data) {
-  let ids = [];
-  for(let i = 0; i < data.length; i++) {
-    ids.push(data[i].id);
-  }
-  return ids;
+// Get Last Output ID
+async function getLastId(threadId) {
+  const threadMessages = await openai.beta.threads.messages.list(
+    threadId
+  );
+  console.log(threadMessages);
+  return threadMessages.body.first_id;
 }
-
-// Get All Steps in 1 Array
-async function getStepMsgsIds(threadId, runId, stepIds) {
-  let steps = [];
-
-  for(let i = 0; i < stepIds.length; i++)
-    steps.push(await readStep(threadId, runId, stepIds[i]));
-  
-  return steps;
-}
-
-
 
 var currentThreadId = "";
 var currentRunId = "";
 var currentRunStatus = "";
 var currentMsgId = "";
-var stepIds = [];
-var stepMsgsIds = [];
-var steps = [];
-var currentResponse = [];
+var currentResponse = "";
+var lastOutputId = "";
+
+
+// Create new thread / Conversation
+app.get('/new', async (req, res) => {
+  currentThreadId = await createThread();
+
+  res.send(currentThreadId);
+});
+
 
 app.post('/chat', async (req, res) => {
   var msg = req.body.msg;
+
   if (currentThreadId == "") 
     currentThreadId = await createThread();
 
   currentMsgId = await createMessage(currentThreadId, msg);
 
   currentRunId = await createRun(currentThreadId, assistantId);
+
   currentRunStatus = await readRun(currentThreadId, currentRunId);
 
   while (currentRunStatus != "completed") 
     currentRunStatus = await readRun(currentThreadId, currentRunId);
-
-  stepIds = getStepIds(await listSteps(currentThreadId, currentRunId));
-
-  //
-  stepMsgsIds = await getStepMsgsIds(currentThreadId, currentRunId, stepIds);
-  console.log(stepMsgsIds);
-  //
-  for(let i = 0; i < stepMsgsIds.length; i++) {
-    let aStep = "";
-    aStep = await readMessage(currentThreadId, stepMsgsIds[i]);
-    steps.push(aStep);
-    res.write(aStep);
-  }
-
-  console.log(steps);
-  res.end();
   
+  currentResponseId = await getLastId(currentThreadId);
+
+  currentResponse = await readMessage(currentThreadId, lastOutputId);
+
+  res.write(currentResponse);
+
+  res.end();
 });
 
 app.get('/', (req, res) => {
