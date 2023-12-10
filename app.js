@@ -353,10 +353,10 @@ app.get('/new', async (req, res) => {
 
 app.post('/test', (req, res) => {
   let threadId = "";
-  let msg = "";
+  let msgg = "";
   console.log(req.body);
   console.log(req.body.msgg);
-  msg = req.body.msgg;
+  msgg = req.body.msgg;
   threadId = req.body.threadId;
   res.send({
     "msg": msgg,
