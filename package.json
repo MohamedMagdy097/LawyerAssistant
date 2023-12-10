@@ -4,9 +4,6 @@
   "description": "",
   "type": "module",
   "main": "app.js",
-  "scripts": {
-    "start": "nodemon app.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MohamedMagdy097/LawyerAssistantBackend.git"
