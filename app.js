@@ -352,7 +352,15 @@ app.get('/new', async (req, res) => {
 });
 
 app.post('/test', (req, res) => {
+  let threadId = "";
+  let msg = "";
   console.log(req.body);
+  msg = req.body.msg;
+  threadId = req.body.threadId;
+  res.send({
+    msg: msg,
+    threadId: threadId
+  });
 });
 
 
