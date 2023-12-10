@@ -367,11 +367,11 @@ app.post('/test', (req, res) => {
 
 app.post('/chat', async (req, res) => {
   var msg = req.body.msg;
+  var threadId = req.body.threadId;
+  console.log(msg);
+  console.log(threadId);
 
-  if (req.body.threadId == "") 
-    currentThreadId = await createThread();
-  else
-    currentThreadId = req.body.threadId;
+  currentThreadId = threadId;
   
   currentMsgId = await createMessage(currentThreadId, msg);
 
