@@ -369,7 +369,7 @@ app.post('/chat', async (req, res) => {
   while (currentRunStatus != "completed") 
     currentRunStatus = await readRun(currentThreadId, currentRunId);
   
-  currentResponseId = await getLastId(currentThreadId);
+  lastOutputId = await getLastId(currentThreadId);
 
   currentResponse = await readMessage(currentThreadId, lastOutputId);
 
