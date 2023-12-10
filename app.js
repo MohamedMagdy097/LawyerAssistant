@@ -354,9 +354,10 @@ app.get('/new', async (req, res) => {
 app.post('/test', (req, res) => {
   let threadId = "";
   let msg = "";
-  console.log(req.body);
-  msg = req.body.msg;
-  threadId = req.body.threadId;
+  console.log(req.body.haha);
+  console.log(req.body.haha2);
+  msg = req.body.haha;
+  threadId = req.body.haha2;
   res.send({
     msg: msg,
     threadId: threadId
