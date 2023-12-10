@@ -354,13 +354,13 @@ app.get('/new', async (req, res) => {
 app.post('/test', (req, res) => {
   let threadId = "";
   let msg = "";
-  console.log(req.body.haha);
-  console.log(req.body.haha2);
-  msg = req.body.haha;
-  threadId = req.body.haha2;
+  console.log(req.body);
+  console.log(req.body.msgg);
+  msg = req.body.msgg;
+  threadId = req.body.threadId;
   res.send({
-    msg: msg,
-    threadId: threadId
+    "msg": msgg,
+    "threadId": threadId
   });
 });
 
