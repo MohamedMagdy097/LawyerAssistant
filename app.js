@@ -351,6 +351,10 @@ app.get('/new', async (req, res) => {
   res.send(currentThreadId);
 });
 
+app.post('/test', (req, res) => {
+  console.log(req.body);
+});
+
 
 app.post('/chat', async (req, res) => {
   var msg = req.body.msg;
