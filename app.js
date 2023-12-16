@@ -511,11 +511,13 @@ app.post('/chatt', (req, res) => {
   let threadId = "";
   let msg = "";
   console.log(req.body);
-  console.log(req.body.msg);
-  console.log(req.body.theadId);
 
   msg = req.body.msg;
   threadId = req.body.threadId;
+
+  console.log(msg);
+  console.log(threadId);
+  
   res.send(JSON.stringify({
     "msg": msg,
     "threadId": threadId
