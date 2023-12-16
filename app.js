@@ -507,15 +507,17 @@ app.get('/new', async (req, res) => {
 });
 
 // Test
-app.post('/test', (req, res) => {
+app.post('/chatt', (req, res) => {
   let threadId = "";
-  let msgg = "";
+  let msg = "";
   console.log(req.body);
-  console.log(req.body.msgg);
-  msgg = req.body.msgg;
+  console.log(req.body.msg);
+  console.log(req.body.theadId);
+
+  msg = req.body.msg;
   threadId = req.body.threadId;
   res.send({
-    "msg": msgg,
+    "msg": msg,
     "threadId": threadId
   });
 });
@@ -546,6 +548,7 @@ app.post('/chat', async (req, res) => {
 
   res.end();
 });
+
 
 // Delete a thread
 app.post('/delete', async (req, res) => {
