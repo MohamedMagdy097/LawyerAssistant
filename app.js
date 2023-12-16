@@ -516,10 +516,10 @@ app.post('/chatt', (req, res) => {
 
   msg = req.body.msg;
   threadId = req.body.threadId;
-  res.send({
+  res.send(JSON.stringify({
     "msg": msg,
     "threadId": threadId
-  });
+  }));
 });
 
 // Chat with the assistant
