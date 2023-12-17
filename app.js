@@ -1,4 +1,5 @@
-import { config } from "dotenv";
+
+ { config } from "dotenv";
 config();
 let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
 
@@ -529,6 +530,7 @@ app.post('/chat', async (req, res) => {
   var msg = req.body.msg;
   var threadId = req.body.threadId;
   
+  console.log(msg);
   console.log(threadId);
 
   currentThreadId = threadId;
