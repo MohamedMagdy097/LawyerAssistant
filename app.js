@@ -312,7 +312,7 @@ async function createMessage(threadId, content) {
     { role: "user", content: content }
   );
 
-  console.log(threadMessages);
+  console.log(threadMessages.id);
   return threadMessages.id;
 }
 
@@ -365,7 +365,7 @@ async function createRun(threadId, ID) {
     { assistant_id: ID }
   );
 
-  console.log(run);
+  console.log(run.id);
   return run.id;
 }
 
@@ -376,7 +376,7 @@ async function readRun(threadId, runId) {
     runId
   );
 
-  console.log(run);
+  console.log(run.status);
   return run.status;
 }
 
@@ -419,7 +419,7 @@ async function listRuns(threadId) {
     threadId
   );
 
-  console.log(runs);
+  console.log(runs.data);
   return runs.data;
 }
 
@@ -495,7 +495,7 @@ async function getLastId(threadId) {
   const threadMessages = await openai.beta.threads.messages.list(
     threadId
   );
-  console.log(threadMessages);
+  console.log(threadMessages.body.first_id);
   return threadMessages.body.first_id;
 }
 
@@ -528,7 +528,7 @@ app.post('/chatt', (req, res) => {
 app.post('/chat', async (req, res) => {
   var msg = req.body.msg;
   var threadId = req.body.threadId;
-  console.log(msg);
+  
   console.log(threadId);
 
   currentThreadId = threadId;
