@@ -365,7 +365,8 @@ app.post('/register', async (req, res) => {
   let email = req.body.email;
   let sup_email = req.body.sup_email;
 
-  let sup_id = await sql`select id from lawyer where email = ${sup_email}`;
+  let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
+  let sup_id = sup_id_result.length > 0 ? sup_id_result[0].id : null;
 
   let emailExists = checkEmail(email);
   if (emailExists.length > 0) {
