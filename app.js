@@ -401,7 +401,7 @@ app.post('/login', async (req, res) => {
     }
 
     else {
-      res.write(JSON.stringify(result[0]));
+      // res.write(JSON.stringify(result[0]));
       lawyer = result[0];
 
       if (lawyer.type == "supervisor") {
@@ -413,7 +413,11 @@ app.post('/login', async (req, res) => {
           for (let i = 0; i < todos.length; i++) {
             todos[i].deadline = cleanDate(todos[i].deadline);
           }
-          res.write(JSON.stringify(todos));
+          // res.write(JSON.stringify(todos));
+          res.send({
+            "user": lawyer,
+            "todos": todos
+          });
         }
         else {
           res.write("No todos");
@@ -439,7 +443,11 @@ app.post('/login', async (req, res) => {
           for (let i = 0; i < todos.length; i++) {
             todos[i].deadline = cleanDate(todos[i].deadline);
           }
-          res.write(JSON.stringify(todos));
+          // res.write(JSON.stringify(todos));
+          res.send({
+            "user": lawyer,
+            "todos": todos
+          });
         }
         else {
           res.write("No todos");
