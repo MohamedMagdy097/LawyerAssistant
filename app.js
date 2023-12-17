@@ -366,13 +366,18 @@ app.post('/register', async (req, res) => {
   let sup_email = req.body.sup_email;
 
   let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
-  let sup_id = sup_id_result.length > 0 ? sup_id_result[0].id : null;
+  // Check if sup_email exists or not
+  if (sup_id_result.length === 0) {
+    res.send("wrong supervisor email");
+    return; // Stop execution here if supervisor email doesn't exist
+  }
+  let sup_id = sup_id_result[0].id;
 
   let emailExists = checkEmail(email);
   if (emailExists.length > 0) {
     res.send("email already exists");
   }
-
+  
   let result = await createAccount(name, password, job_title, type, email, sup_id);
 
   if(result.length == 0)
