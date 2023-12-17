@@ -28,24 +28,6 @@ async function getPgVersion() {
   console.log("Database Connected\n" , result[0].version);
 }
 
-// Fetch all accounts
-async function allLawyers() {
-  const result = await sql`select * from lawyer`;
-  console.log(result);
-};
-
-// Fetch all todos
-async function allTodos() {
-  const result = await sql`select * from todos`;
-  console.log(result);
-};
-
-// fetch all todos assigned for or by users and its status
-async function allTodosStatus() {
-  const result = await sql`select * from donetodo`;
-  console.log(result);
-}
-
 // createAccount(name, password, jobtitle, type, email, sup_id)
 async function createAccount(name, password, job_title, type, email, sup_id) {
   const result = await sql`INSERT INTO lawyer (name, password, job_title, type, email, sup_id)
@@ -155,114 +137,6 @@ app.use(cors());
 
 const assistantId = 'asst_doz8twF3Zg9vAqZxNtFaRZyP';
 
-const inst = "You are a lawyer assistant. when asked a question answer as a lawyers assistant.";
-var fileIds = ['file-i7ZXjwbamadWyc2qTtVUaeLa'];
-
-
-// https://platform.openai.com/docs/api-reference/assistants/file-object?lang=node.js
-//CRUD
-
-async function createAssistant(name, instructions) {
-  const myAssistant = await openai.beta.assistants.create({
-    instructions: instructions,
-    name: name,
-    tools: [{ type: "retrieval" }, { type: "code_interpreter" }],
-    model: "gpt-3.5-turbo-1106",
-  });
-  
-  console.log(myAssistant);
-  //assistantId = myAssistant.id;
-}
-
-async function ReadAssistant(ID) {
-  const myAssistant = await openai.beta.assistants.retrieve(
-    ID
-  );
-  
-  console.log(myAssistant);
-}
-
-async function ListAssistants() {
-  const myAssistants = await openai.beta.assistants.list({
-    order: "desc",
-    limit: "20",
-  });
-
-  console.log(myAssistants.data);
-}
-
-async function UpdateAssistant(ID, instructions, name, fileId) {
-  if (fileId != null) {
-    fileIds.push(fileId);
-  }
-  const myUpdatedAssistant = await openai.beta.assistants.update(
-    ID,
-    {
-      instructions: instructions,
-      name: name,
-      tools: [{ type: "retrieval" }],
-      model: "gpt-3.5-turbo-1106",
-      file_ids: fileIds,
-    }
-  );
-  console.log(myUpdatedAssistant);
-}
-
-async function DeleteAssistant(ID) {
-  const response = await openai.beta.assistants.del(ID);
-
-  console.log(response);
-}
-
-// UPLOADS A FILE TO OPENAI AND RETURNS FILE ID
-async function uploadFile(filename) {
-  const file = await openai.files.create({
-    file: fs.createReadStream(filename),
-    purpose: "assistants",
-  });
-
-  console.log(file);
-  return file.id;
-}
-
-// ATTACHES FILE TO AN ASSISTANT
-async function fileToAssistant(fileId, ID) {
-  const myAssistantFile = await openai.beta.assistants.files.create(
-    ID, 
-    { 
-      file_id: fileId
-    }
-  );
-  console.log(myAssistantFile);
-}
-
-// TESTS IF THE FILE IS ATTACHED TO THE ASSISTANT
-async function testFile(ID, fileId) {
-  const myAssistantFile = await openai.beta.assistants.files.retrieve(
-    ID,
-    fileId
-  );
-  console.log(myAssistantFile);
-}
-
-// DELETE A FILE FROM AN ASSISTANT
-async function deleteFile(ID, fileId) {
-  const deletedAssistantFile = await openai.beta.assistants.files.del(
-    ID,
-    fileId
-  );
-  console.log(deletedAssistantFile);
-}
-
-// LIST FILES OF AN ASSISTANT IN AN ARRAY CALLED `data`
-async function listFiles(ID){
-  const assistantFiles = await openai.beta.assistants.files.list(
-    ID
-  );
-  console.log(assistantFiles);
-}
-
-
 //
 // THREADS
 //
@@ -281,18 +155,6 @@ async function readThread(threadId) {
   );
 
   console.log(myThread);    
-}
-
-// Update a thread VIP ATTACH THREAD TO USER TEST
-async function updateThread(threadId) {
-  const updatedThread = await openai.beta.threads.update(
-    threadId,
-    {
-      metadata: { modified: "true", user: "abc123" },
-    }
-  );
-
-  console.log(updatedThread);
 }
 
 // Delete a thread
@@ -327,31 +189,11 @@ async function readMessage(threadId, msgId) {
   return message.content[0].text.value;
 }
 
-// Update a Message x
-async function updateMessage(threadId, msgId) {
-  const message = await openai.beta.threads.messages.update(
-    threadId,
-    msgId,
-    {
-      metadata: {
-        modified: "true",
-        user: "abc123",
-      },
-    });
-  console.log(message);
-}
-
 // List Messages RETURNS AN ARRAY OF DATA LOOK INSIDE TO GET EXAMPLE
 async function listMessages(threadId) {
   const threadMessages = await openai.beta.threads.messages.list(
     threadId
   );
-  // loop the array of data[i] ex: threadMessages.data[i].content[0].text.value;
-  // for(let i = 0; i < threadMessages.data.length; i++) {
-  //   console.log(threadMessages.data[i].content[0].text.value);
-  // }
-  // console.log(threadMessages.body.first_id);
-  // readMessage(threadId, threadMessages.body.first_id);
   return threadMessages;
 }
 
@@ -359,10 +201,10 @@ async function listMessages(threadId) {
 // RUNS
 //
 // Create a run RETURNS RUN ID
-async function createRun(threadId, ID) {
+async function createRun(threadId) {
   const run = await openai.beta.threads.runs.create(
     threadId,
-    { assistant_id: ID }
+    { assistant_id: assistantId }
   );
 
   console.log(run.id);
@@ -378,21 +220,6 @@ async function readRun(threadId, runId) {
 
   console.log(run.status);
   return run.status;
-}
-
-// Update a run
-async function updateRun(threadId, runId) {
-  const run = await openai.beta.threads.runs.update(
-    threadId,
-    runId,
-    {
-      metadata: {
-        user_id: "user_abc123",
-      },
-    }
-  );
-
-  console.log(run);
 }
 
 // REQUIRES ACTION FUNCTION `still needs developing`
@@ -423,49 +250,9 @@ async function listRuns(threadId) {
   return runs.data;
 }
 
-// Cancel a run
-async function cancelRun(threadId, runId) {
-  const run = await openai.beta.threads.runs.cancel(
-    threadId,
-    runId
-  );
-
-  console.log(run);
-}
-
-
-//
-// STEPS
-//
-// Reads step in a specific run RETURNS MESSAGE ID
-async function readStep(threadId, runId, stepId) {
-  const runStep = await openai.beta.threads.runs.steps.retrieve(
-    threadId,
-    runId,
-    stepId
-  );
-  console.log(runStep);
-  return runStep.step_details.message_creation.message_id;
-}
-
-// List all steps to a specific run RETURNS LAST STEP ID
-async function listSteps(threadId, runId) {
-  const runStep = await openai.beta.threads.runs.steps.list(
-    threadId,
-    runId
-  );
-  console.log(runStep);
-
-  return runStep.data;
-}
-
-
 //
 // APP
 //
-// After Uploading a file copy its id from logs
-// uploadFile('filename.txt');
-// fileToAssistant('file-i7ZXjwbamadWyc2qTtVUaeLa', assistantId);
 
 var currentThreadId = "";
 var currentRunId = "";
@@ -474,7 +261,7 @@ var currentMsgId = "";
 var currentResponse = "";
 var lastOutputId = "";
 var lawyer;
-var todos;
+var todos = [];
 var todoIds;
 
 // removing unncessary string from date
@@ -523,6 +310,7 @@ app.post('/chatt', (req, res) => {
     "threadId": threadId
   }));
 });
+
 
 // Chat with the assistant
 app.post('/chat', async (req, res) => {
@@ -622,23 +410,24 @@ app.post('/login', async (req, res) => {
           res.write(JSON.stringify(todos));
         }
         else {
-          res.write("no todos");
+          res.write("No todos");
         }
       }
       else {
         // Fetching todos for lawyer
         todoIds = await fetchTodoIds(lawyer.id);
 
-        console.log(todoIds);
-
         if (todoIds.length > 0) {
-          for(let i = 0; i < todoIds.length; i++) {
-            todos[i] = await sql`
+          const todosPromises = todoIds.map(async (todoId) => {
+            const result = await sql`
               SELECT *
               FROM todos
-              WHERE id = ${todoIds[i].todo_id}
+              WHERE id = ${todoId.todo_id}
             `;
-          }
+            return result[0]; // Assuming your query returns an array of todos
+          });
+        
+          todos = await Promise.all(todosPromises);
 
           // Removing unnecessary string from date
           for (let i = 0; i < todos.length; i++) {
@@ -647,7 +436,7 @@ app.post('/login', async (req, res) => {
           res.write(JSON.stringify(todos));
         }
         else {
-          res.write("no todos");
+          res.write("No todos");
         }
       }
       
