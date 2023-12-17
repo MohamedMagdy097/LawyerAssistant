@@ -575,19 +575,21 @@ app.post('/register', async (req, res) => {
   let job_title = req.body.job_title;
   let type = req.body.type;
   let email = req.body.email;
-  let sup_id = req.body.sup_id;
+  let sup_email = req.body.sup_email;
+
+  let sup_id = await sql`select id from lawyer where email = ${sup_email}`;
 
   let emailExists = checkEmail(email);
   if (emailExists.length > 0) {
-    res.send("Email already exists");
+    res.send("email already exists");
   }
 
   let result = await createAccount(name, password, job_title, type, email, sup_id);
 
   if(result.length == 0)
-    res.send("Account created");
+    res.send("account created");
   else
-    res.send("Account creation failed");
+    res.send("account creation failed");
 });
 
 // login to an account
@@ -620,12 +622,14 @@ app.post('/login', async (req, res) => {
           res.write(JSON.stringify(todos));
         }
         else {
-          res.write("No todos");
+          res.write("no todos");
         }
       }
       else {
         // Fetching todos for lawyer
         todoIds = await fetchTodoIds(lawyer.id);
+
+        console.log(todoIds);
 
         if (todoIds.length > 0) {
           for(let i = 0; i < todoIds.length; i++) {
@@ -643,7 +647,7 @@ app.post('/login', async (req, res) => {
           res.write(JSON.stringify(todos));
         }
         else {
-          res.write("No todos");
+          res.write("no todos");
         }
       }
       
