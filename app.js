@@ -358,35 +358,50 @@ app.get('/', (req, res) => {
 
 // register a new account
 app.post('/register', async (req, res) => {
-  let name = req.body.name;
-  let password = req.body.password;
-  let job_title = req.body.job_title;
-  let type = req.body.type;
-  let email = req.body.email;
-  let sup_email = req.body.sup_email;
+  try {
+    let name = req.body.name;
+    let password = req.body.password;
+    let job_title = req.body.job_title;
+    let type = req.body.type;
+    let email = req.body.email;
+    let sup_email = req.body.sup_email;
 
-  let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
-  // Check if sup_email exists or not
-  if (sup_id_result.length === 0) {
-    res.send("wrong supervisor email");
-    return; // Stop execution here if supervisor email doesn't exist
+    // Check if any of the required fields is missing
+    if (!name || !password || !job_title || !type || !email || !sup_email) {
+      throw new Error("Missing required fields");
+    }
+
+    let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
+
+    // Check if sup_email exists or not
+    if (sup_id_result.length === 0) {
+      res.send("wrong supervisor email");
+      return; // Stop execution here if supervisor email doesn't exist
+    }
+
+    let sup_id = sup_id_result[0].id;
+
+    let emailExists = await checkEmail(email);
+
+    if (emailExists.length > 0) {
+      console.log("email already exists");
+      res.send("email already exists");
+      return;
+    }
+
+    let result = await createAccount(name, password, job_title, type, email, sup_id);
+
+    if (result.length === 0) {
+      res.send("account created");
+    } else {
+      res.send("account creation failed");
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(400).send("Missing required fields or other error");
   }
-  let sup_id = sup_id_result[0].id;
-
-  let emailExists = await checkEmail(email);
-  if (emailExists.length > 0) {
-    console.log("email already exists");
-    res.send("email already exists");
-    return;
-  }
-  
-  let result = await createAccount(name, password, job_title, type, email, sup_id);
-
-  if(result.length == 0)
-    res.send("account created");
-  else
-    res.send("account creation failed");
 });
+
 
 // login to an account
 app.post('/login', async (req, res) => {
