@@ -420,7 +420,10 @@ app.post('/login', async (req, res) => {
           });
         }
         else {
-          res.write("No todos");
+          res.send({
+            "user": lawyer,
+            "todos": "no todos"
+          });
         }
       }
       else {
@@ -450,11 +453,12 @@ app.post('/login', async (req, res) => {
           });
         }
         else {
-          res.write("No todos");
+          res.send({
+            "user": lawyer,
+            "todos": "no todos"
+          });
         }
       }
-      
-      res.end();
     }
   }
 
