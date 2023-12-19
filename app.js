@@ -373,7 +373,7 @@ app.post('/register', async (req, res) => {
   }
   let sup_id = sup_id_result[0].id;
 
-  let emailExists = checkEmail(email);
+  let emailExists = await checkEmail(email);
   if (emailExists.length > 0) {
     console.log("email already exists");
     res.send("email already exists");
