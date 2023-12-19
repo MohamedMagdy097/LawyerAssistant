@@ -375,7 +375,9 @@ app.post('/register', async (req, res) => {
 
   let emailExists = checkEmail(email);
   if (emailExists.length > 0) {
+    console.log("email already exists");
     res.send("email already exists");
+    return;
   }
   
   let result = await createAccount(name, password, job_title, type, email, sup_id);
