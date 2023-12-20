@@ -368,14 +368,14 @@ app.post('/register', async (req, res) => {
 
     // Check if any of the required fields is missing
     if (!name || !password || !job_title || !type || !email || (!sup_email && type != "supervisor")) {
-      throw new Error("Missing required fields");
+      throw new Error({"word": "Missing required fields"});
     }
 
     let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
 
     // Check if sup_email exists or not
     if (sup_id_result.length === 0 && type != "supervisor") {
-      res.send("wrong supervisor email");
+      res.send({"word": "wrong supervisor email"});
       return; // Stop execution here if supervisor email doesn't exist
     }
 
@@ -385,7 +385,7 @@ app.post('/register', async (req, res) => {
 
     if (emailExists.length > 0) {
       console.log("email already exists");
-      res.send("email already exists");
+      res.send("word": "email already exists");
       return;
     }
 
@@ -393,13 +393,13 @@ app.post('/register', async (req, res) => {
 
 
     if (result.length === 0) {
-      res.send("account created");
+      res.send({"word": "account created"});
     } else {
-      res.send("account creation failed");
+      res.send({"word": "account creation failed"});
     }
   } catch (error) {
     console.error("Error:", error.message);
-    res.status(400).send("Missing required fields or other error");
+    res.status(400).send({"word": "Missing required fields or other error"});
   }
 });
 
@@ -415,7 +415,7 @@ app.post('/login', async (req, res) => {
     let result = await login(email, password);
 
     if(result.length == 0) {
-      res.send("wrong password");
+      res.send("word": "wrong password");
     }
 
     else {
@@ -434,13 +434,15 @@ app.post('/login', async (req, res) => {
           // res.write(JSON.stringify(todos));
           res.send({
             "user": lawyer,
-            "todos": todos
+            "todos": todos,
+            "word": "supervisor logged in successfully"
           });
         }
         else {
           res.send({
             "user": lawyer,
-            "todos": "no todos"
+            "todos": "no todos",
+            "word": "supervisor logged in successfully"
           });
         }
       }
@@ -467,13 +469,15 @@ app.post('/login', async (req, res) => {
           // res.write(JSON.stringify(todos));
           res.send({
             "user": lawyer,
-            "todos": todos
+            "todos": todos,
+            "word": "logged in successfully"
           });
         }
         else {
           res.send({
             "user": lawyer,
-            "todos": "no todos"
+            "todos": "no todos",
+            "word": "logged in successfully"
           });
         }
       }
@@ -481,7 +485,7 @@ app.post('/login', async (req, res) => {
   }
 
   else {
-    res.send("Email does not exist");
+    res.send("word": "email does not exist");
   }
 
 });
@@ -491,15 +495,13 @@ app.post('/create', async (req, res) => {
   let title = req.body.title;
   let description = req.body.description;
   let deadline = req.body.deadline;
-  let l_id = req.body.l_id;
-  // in production
-  // let l_id = lawyer.id;
+  let l_id = lawyer.id;
   let junior_id = parseInt(req.body.junior_ids);
 
   let result = await createTodo(title, description, deadline, l_id);
 
   if(result.length == 0) {
-    res.write("Todo created");
+    res.write("word": "todo created");
 
     let todo_id = await fetchTodoId(title, description, deadline, l_id);
 
@@ -507,7 +509,7 @@ app.post('/create', async (req, res) => {
     res.end();
   }
   else {
-    res.send("Todo creation failed");
+    res.send("word": "todo creation failed");
   }
 });
 
@@ -521,10 +523,10 @@ app.post('/deletetodo', async (req, res) => {
   `;
 
   if(result.length == 0) {
-    res.send("Todo deleted");
+    res.send("word": "todo deleted");
   }
   else {
-    res.send("Todo deletion failed");
+    res.send("word": "todo deletion failed");
   }
 });
 
@@ -542,7 +544,7 @@ app.post('/namesearch', async (req, res) => {
   if (result.length > 0) {
     res.json(result);
   } else {
-    res.send("User not found");
+    res.send("word": "user not found");
   }
 
 });
@@ -561,7 +563,7 @@ app.post('/emailsearch', async (req, res) => {
   if (result.length > 0) {
     res.json(result);
   } else {
-    res.send("User not found");
+    res.send("word": "user not found");
   }
 
 });
