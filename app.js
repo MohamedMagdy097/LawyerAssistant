@@ -385,7 +385,7 @@ app.post('/register', async (req, res) => {
 
     if (emailExists.length > 0) {
       console.log("email already exists");
-      res.send("word": "email already exists");
+      res.send({"word": "email already exists"});
       return;
     }
 
@@ -415,7 +415,7 @@ app.post('/login', async (req, res) => {
     let result = await login(email, password);
 
     if(result.length == 0) {
-      res.send("word": "wrong password");
+      res.send({"word": "wrong password"});
     }
 
     else {
@@ -485,7 +485,7 @@ app.post('/login', async (req, res) => {
   }
 
   else {
-    res.send("word": "email does not exist");
+    res.send({"word": "email does not exist"});
   }
 
 });
@@ -501,7 +501,7 @@ app.post('/create', async (req, res) => {
   let result = await createTodo(title, description, deadline, l_id);
 
   if(result.length == 0) {
-    res.write("word": "todo created");
+    res.write({"word": "todo created"});
 
     let todo_id = await fetchTodoId(title, description, deadline, l_id);
 
@@ -509,7 +509,7 @@ app.post('/create', async (req, res) => {
     res.end();
   }
   else {
-    res.send("word": "todo creation failed");
+    res.send({"word": "todo creation failed"});
   }
 });
 
@@ -523,10 +523,10 @@ app.post('/deletetodo', async (req, res) => {
   `;
 
   if(result.length == 0) {
-    res.send("word": "todo deleted");
+    res.send({"word": "todo deleted"});
   }
   else {
-    res.send("word": "todo deletion failed");
+    res.send({"word": "todo deletion failed"});
   }
 });
 
@@ -544,7 +544,7 @@ app.post('/namesearch', async (req, res) => {
   if (result.length > 0) {
     res.json(result);
   } else {
-    res.send("word": "user not found");
+    res.send({"word": "user not found"});
   }
 
 });
@@ -563,7 +563,7 @@ app.post('/emailsearch', async (req, res) => {
   if (result.length > 0) {
     res.json(result);
   } else {
-    res.send("word": "user not found");
+    res.send({"word": "user not found"});
   }
 
 });
