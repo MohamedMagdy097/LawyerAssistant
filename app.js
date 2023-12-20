@@ -367,7 +367,7 @@ app.post('/register', async (req, res) => {
     let sup_email = req.body.sup_email;
 
     // Check if any of the required fields is missing
-    if (!name || !password || !job_title || !type || !email) {
+    if (!name || !password || !job_title || !type || !email || (!sup_email && type != "supervisor")) {
       throw new Error("Missing required fields");
     }
 
@@ -390,6 +390,7 @@ app.post('/register', async (req, res) => {
     }
 
     let result = await createAccount(name, password, job_title, type, email, sup_id);
+
 
     if (result.length === 0) {
       res.send("account created");
