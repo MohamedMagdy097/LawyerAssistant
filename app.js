@@ -367,7 +367,7 @@ app.post('/register', async (req, res) => {
     let sup_email = req.body.sup_email;
 
     // Check if any of the required fields is missing
-    if (!name || !password || !job_title || !type || !email || !sup_email) {
+    if (!name || !password || !job_title || !type || !email) {
       throw new Error("Missing required fields");
     }
 
