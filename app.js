@@ -374,7 +374,7 @@ app.post('/register', async (req, res) => {
     let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
 
     // Check if sup_email exists or not
-    if (sup_id_result.length === 0) {
+    if (sup_id_result.length === 0 && type != "supervisor") {
       res.send("wrong supervisor email");
       return; // Stop execution here if supervisor email doesn't exist
     }
