@@ -371,13 +371,16 @@ app.post('/register', async (req, res) => {
       throw new Error({"word": "Missing required fields"});
     }
 
-    let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
-
-    // Check if sup_email exists or not
-    if (sup_id_result.length === 0 && type != "supervisor") {
-      res.send({"word": "wrong supervisor email"});
-      return; // Stop execution here if supervisor email doesn't exist
+    if (type != "superviser") {
+      var sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
+      // Check if sup_email exists or not
+      if (sup_id_result.length === 0 && type != "supervisor") {
+        res.send({"word": "wrong supervisor email"});
+        return; // Stop execution here if supervisor email doesn't exist
+      }
     }
+
+    
 
     let sup_id = sup_id_result[0].id;
 
