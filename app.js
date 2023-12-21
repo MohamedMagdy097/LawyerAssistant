@@ -494,6 +494,13 @@ app.post('/login', async (req, res) => {
           for (let i = 0; i < todos.length; i++) {
             todos[i].deadline = cleanDate(todos[i].deadline);
           }
+          let supName = "";
+          let supNameResult = await sql`SELECT name From lawyer WHERE id = ${lawyer.sup_id}`;
+          supName = supNameResult[0].name; 
+
+          for (let i = 0; i < todos.length; i++) {
+            todos[i].name = supName;
+          }
           // res.write(JSON.stringify(todos));
           res.send({
             "user": lawyer,
