@@ -436,27 +436,17 @@ app.post('/login', async (req, res) => {
             todos[i].deadline = cleanDate(todos[i].deadline);
           }
 
-          let jIds = [];
-          for (let i = 0; i < todos.length; i++) {
-            jIds = await sql`SELECT l_id FROM donetodo WHERE todo_id = ${todos[i].id}`;
-          
-            // Initialize an array to store names corresponding to each todo
-            const namesForTodo = [];
-          
-            for (let j = 0; j < jIds.length; j++) {
-              const lawyerData = await sql`SELECT name FROM lawyer WHERE id = ${jIds[j].l_id}`;
-              
-              // Assuming each lawyerData result has a 'name' property
-              const lawyerName = lawyerData[0].name;
-          
-              // Add the lawyer name to the array
-              namesForTodo.push(lawyerName);
-            }
-          
-            // Assign the array of names to the 'name' property of the corresponding todo
-            todos[i].name = namesForTodo;
+          // Fetching done status for todos
+          for(let i = 0; i < todos.length; i++) {
+            let done = await sql`SELECT done FROM donetodo WHERE todo_id = ${todos[i].id}`;
+            todos[i].done = done[0].done;
           }
-          console.log(todos);
+
+          // Fetching junior names for todos
+          for(let i = 0; i < todos.length; i++) {
+            let juniors = await sql`SELECT name FROM lawyer WHERE id IN (SELECT l_id FROM donetodo WHERE todo_id = ${todos[i].id})`;
+            todos[i].name = juniors[0];
+          }
 
           
           res.send({
@@ -488,6 +478,11 @@ app.post('/login', async (req, res) => {
           });
         
           todos = await Promise.all(todosPromises);
+
+          for(let i = 0; i < todos.length; i++) {
+            let done = await sql`SELECT done FROM donetodo WHERE todo_id = ${todos[i].id}`;
+            todos[i].done = done[0].done;
+          }
 
           // Removing unnecessary string from date
           for (let i = 0; i < todos.length; i++) {
