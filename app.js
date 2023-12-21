@@ -557,6 +557,48 @@ app.get('/juniors', async (req, res) => {
   }
 });
 
+// get all lawyers
+app.get('/lawyers', async (req, res) => {
+  let result = await sql`
+    SELECT *
+    FROM lawyer
+  `;
+
+  if (result.length > 0) {
+    res.send({"user": result});
+  } else {
+    res.send({"word": "no lawyers"});
+  }
+});
+
+// get todos
+app.get('/todos', async (req, res) => {
+  let result = await sql`
+    SELECT *
+    FROM todos
+  `;
+
+  if (result.length > 0) {
+    res.send({"todos": result});
+  } else {
+    res.send({"word": "no todos"});
+  }
+});
+
+// get todos status
+app.get('/todosstatus', async (req, res) => {
+  let result = await sql`
+    SELECT *
+    FROM donetodo
+  `;
+
+  if (result.length > 0) {
+    res.send({"todosStatus": result});
+  } else {
+    res.send({"word": "no todos"});
+  }
+});
+
 // done lawyer
 app.post('/done', async (req, res) => {
   let id = req.body.id;
