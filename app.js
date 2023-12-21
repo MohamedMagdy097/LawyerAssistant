@@ -565,6 +565,22 @@ app.get('/juniors', async (req, res) => {
   }
 });
 
+// done lawyer
+app.post('/done', async (req, res) => {
+  let id = req.body.id;
+  let result = await sql`
+    UPDATE donetodo
+    SET done = true
+    WHERE todo_id = ${id} AND l_id = ${lawyer.id}
+  `;
+
+  if (result.length == 0) {
+    res.send({"word": "todo marked as done"});
+  } else {
+    res.send({"word": "todo marking as done failed"});
+  }
+});
+
 // delete a todo
 app.post('/deletetodo', async (req, res) => {
   let id = req.body.id;
