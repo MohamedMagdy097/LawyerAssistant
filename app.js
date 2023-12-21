@@ -139,7 +139,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-const assistantId = 'asst_doz8twF3Zg9vAqZxNtFaRZyP';
+
 
 //
 // THREADS
