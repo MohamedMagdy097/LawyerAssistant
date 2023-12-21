@@ -525,14 +525,12 @@ app.post('/create', async (req, res) => {
   let description = req.body.description;
   let deadline = req.body.deadline;
   let l_id = lawyer.id;
-  let junior_ids = JSON.parse(req.body.junior_ids);
+  let junior_id = req.body.junior_id;
   
   let result = await createTodo(title, description, deadline, l_id);
   let todo_id = await fetchTodoId(title, description, l_id);
 
-  for(let i = 0; i < junior_ids.length; i++) {
-    await assignTodoToLawyers(todo_id, junior_ids[i]);
-  }
+  await assignTodoToLawyers(todo_id, junior_id);
 
   if(result.length == 0) {
     res.send({"word": "Todo created and assigned", "todo_id": todo_id});
