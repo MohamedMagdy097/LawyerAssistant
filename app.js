@@ -353,56 +353,50 @@ app.get('/', (req, res) => {
 
 // register a new account
 app.post('/register', async (req, res) => {
-  try {
-    let name = req.body.name;
-    let password = req.body.password;
-    let job_title = req.body.job_title;
-    let type = req.body.type;
-    let email = req.body.email;
-    let sup_email = req.body.sup_email;
-    let sup_id = null;
+  let name = req.body.name;
+  let password = req.body.password;
+  let job_title = req.body.job_title;
+  let type = req.body.type;
+  let email = req.body.email;
+  let sup_email = req.body.sup_email;
+  let sup_id = null;
 
-    // Check if any of the required fields is missing
-    if (!name || !password || !job_title || !type || !email || !sup_email) {
-      throw new Error({"word": "Missing required fields"});
-    }
+  // Check if any of the required fields is missing
+  if (!name || !password || !job_title || !type || !email || !sup_email) {
+    res.send({"word": "Missing required fields"});
+  }
 
-    if (type != "supervisor") {
-     let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
-       // Check if sup_email exists or not
-       if (sup_id_result.length === 0 && type != "supervisor") {
-         res.send({"word": "wrong supervisor email"});
-         return; // Stop execution here if supervisor email doesn't exist
-       }
-       sup_id = sup_id_result[0].id;
-    }
-    else {
-      sup_id = null;
-    }
+  if (type != "supervisor") {
+    let sup_id_result = await sql`select id from lawyer where email = ${sup_email}`;
+      // Check if sup_email exists or not
+      if (sup_id_result.length === 0 && type != "supervisor") {
+        res.send({"word": "wrong supervisor email"});
+        return; // Stop execution here if supervisor email doesn't exist
+      }
+      sup_id = sup_id_result[0].id;
+  }
+  else {
+    sup_id = null;
+  }
 
-    
-    let emailExists = await checkEmail(email);
+  
+  let emailExists = await checkEmail(email);
 
-    if (emailExists.length > 0) {
-      console.log("email already exists");
-      res.send({"word": "email already exists"});
-      return;
-    }
+  if (emailExists.length > 0) {
+    console.log("email already exists");
+    res.send({"word": "email already exists"});
+    return;
+  }
 
-    let result = await createAccount(name, password, job_title, type, email, sup_id);
+  let result = await createAccount(name, password, job_title, type, email, sup_id);
 
 
-    if (result.length === 0) {
-      res.send({"word": "account created"});
-    } else {
-      res.send({"word": "account creation failed"});
-    }
-  } catch (error) {
-    console.error("Error:", error.message);
-    res.status(400).send({"word": "Missing required fields or other error"});
+  if (result.length === 0) {
+    res.send({"word": "account created"});
+  } else {
+    res.send({"word": "account creation failed"});
   }
 });
-
 
 // login to an account
 app.post('/login', async (req, res) => {
@@ -526,28 +520,21 @@ app.post('/create', async (req, res) => {
   let description = req.body.description;
   let deadline = req.body.deadline;
   let l_id = lawyer.id;
+  let junior_ids = JSON.parse(req.body.junior_ids);
   
   let result = await createTodo(title, description, deadline, l_id);
+  let todo_id = await fetchTodoId(title, description, l_id);
 
-  res.send("TODO CREATED");
+  for(let i = 0; i < junior_ids.length; i++) {
+    await assignTodoToLawyers(todo_id, junior_ids[i]);
+  }
+
   if(result.length == 0) {
-    res.send({"word": "Todo created"});
+    res.send({"word": "Todo created and assigned", "todo_id": todo_id});
   }
   else {
     res.send({"word": "Todo creation failed"});
   }
-});
-
-// assing a todo to lawyers
-app.post('/assign', async (req, res) => {
-  let title = req.body.title;
-  let description = req.body.description;
-
-  let junior_id = parseInt(req.body.junior_id);
-  let todo_id = await fetchTodoId(title, description, l_id);
-
-  await assignTodoToLawyers(todo_id, junior_id);
-  res.send({"word": "todo assigned successfully"});
 });
 
 // get juniors
