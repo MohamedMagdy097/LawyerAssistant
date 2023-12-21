@@ -430,13 +430,36 @@ app.post('/login', async (req, res) => {
       if (lawyer.type == "supervisor") {
         // Fetching todos for supervisor
         todos = await fetchSupTodos(lawyer.id);
-
+        
         if (todos.length > 0) {
           // Removing unnecessary string from date
           for (let i = 0; i < todos.length; i++) {
             todos[i].deadline = cleanDate(todos[i].deadline);
           }
-          // res.write(JSON.stringify(todos));
+
+          let jIds = [];
+          for (let i = 0; i < todos.length; i++) {
+            jIds = await sql`SELECT l_id FROM donetodo WHERE todo_id = ${todos[i].id}`;
+          
+            // Initialize an array to store names corresponding to each todo
+            const namesForTodo = [];
+          
+            for (let j = 0; j < jIds.length; j++) {
+              const lawyerData = await sql`SELECT name FROM lawyer WHERE id = ${jIds[j].l_id}`;
+              
+              // Assuming each lawyerData result has a 'name' property
+              const lawyerName = lawyerData[0].name;
+          
+              // Add the lawyer name to the array
+              namesForTodo.push(lawyerName);
+            }
+          
+            // Assign the array of names to the 'name' property of the corresponding todo
+            todos[i].name = namesForTodo;
+          }
+          console.log(todos);
+
+          
           res.send({
             "user": lawyer,
             "todos": todos,
