@@ -113,11 +113,11 @@ async function createTodo(title, description, deadline, l_id) {
 }
 
 // fetch a todo id
-async function fetchTodoId(title, description, deadline, l_id) {
+async function fetchTodoId(title, description, l_id) {
   const result = await sql`
     SELECT id
     FROM todos
-    WHERE title = ${title} AND description = ${description} AND deadline = ${deadline} AND l_id = ${l_id}
+    WHERE title = ${title} AND description = ${description} AND l_id = ${l_id}
   `;
   console.log(result[0]);
   return result[0].id;
@@ -555,7 +555,7 @@ app.post('/assign', async (req, res) => {
   let description = req.body.description;
 
   let junior_id = parseInt(req.body.junior_id);
-  let todo_id = await fetchTodoId(title, description, deadline, l_id);
+  let todo_id = await fetchTodoId(title, description, l_id);
 
   await assignTodoToLawyers(todo_id, junior_id);
   res.send({"word": "todo assigned successfully"});
