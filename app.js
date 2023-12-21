@@ -445,7 +445,7 @@ app.post('/login', async (req, res) => {
           // Fetching junior names for todos
           for(let i = 0; i < todos.length; i++) {
             let juniors = await sql`SELECT name FROM lawyer WHERE id IN (SELECT l_id FROM donetodo WHERE todo_id = ${todos[i].id})`;
-            todos[i].name = juniors[0];
+            todos[i].name = juniors[0].name;
           }
 
           
