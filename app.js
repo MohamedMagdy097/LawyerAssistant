@@ -28,6 +28,15 @@ async function getPgVersion() {
   console.log("Database Connected\n" , result[0].version);
 }
 
+// createAccount(name, password, jobtitle, type, email, sup_id)
+async function createAccount(name, password, job_title, type, email, sup_id) {
+  const result = await sql`INSERT INTO lawyer (name, password, job_title, type, email, sup_id)
+  VALUES
+     (${name}, ${password}, ${job_title}, ${type}, ${email}, ${sup_id});`;
+  console.log(result);
+  return result;
+}
+
 // check if account exists with email and password
 async function login(email, password) {
   const result = await sql`
