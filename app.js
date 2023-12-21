@@ -28,21 +28,6 @@ async function getPgVersion() {
   console.log("Database Connected\n" , result[0].version);
 }
 
-// create a todo
-async function createTodo(title, description, deadline, l_id) {
-  const dateObject = new Date(`${deadline}T00:00:00.000Z`);
-  if (isNaN(dateObject.getTime())) {
-    console.error('Invalid date format');
-    return; // Exit the function if the date is invalid
-  }
-
-  // Format the date object to be in the correct format (timestamp)
-  const formattedDeadline = dateObject.toISOString();
-  const result = await sql`INSERT INTO todos (title, description, deadline, L_id) VALUES (${title}, ${description}, ${formattedDeadline}, ${l_id});`;
-  console.log(result);
-  return result;
-}
-
 // check if account exists with email and password
 async function login(email, password) {
   const result = await sql`
@@ -103,11 +88,15 @@ async function fetchTodoIds(lawyer_id) {
 
 // create a todo
 async function createTodo(title, description, deadline, l_id) {
-  const result = await sql`
-    INSERT INTO todos (title, description, deadline, l_id)
-    VALUES
-      (${title}, ${description}, ${deadline}, ${l_id})
-  `;
+  const dateObject = new Date(`${deadline}T00:00:00.000Z`);
+  if (isNaN(dateObject.getTime())) {
+    console.error('Invalid date format');
+    return; // Exit the function if the date is invalid
+  }
+
+  // Format the date object to be in the correct format (timestamp)
+  const formattedDeadline = dateObject.toISOString();
+  const result = await sql`INSERT INTO todos (title, description, deadline, L_id) VALUES (${title}, ${description}, ${formattedDeadline}, ${l_id});`;
   console.log(result);
   return result;
 }
