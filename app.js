@@ -140,6 +140,7 @@ app.use(express.json());
 app.use(cors());
 
 
+var assistantId = process.env.assistantId;
 
 //
 // THREADS
