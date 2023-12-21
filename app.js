@@ -28,11 +28,17 @@ async function getPgVersion() {
   console.log("Database Connected\n" , result[0].version);
 }
 
-// createAccount(name, password, jobtitle, type, email, sup_id)
-async function createAccount(name, password, job_title, type, email, sup_id) {
-  const result = await sql`INSERT INTO lawyer (name, password, job_title, type, email, sup_id)
-  VALUES
-     (${name}, ${password}, ${job_title}, ${type}, ${email}, ${sup_id});`;
+// create a todo
+async function createTodo(title, description, deadline, l_id) {
+  const dateObject = new Date(`${deadline}T00:00:00.000Z`);
+  if (isNaN(dateObject.getTime())) {
+    console.error('Invalid date format');
+    return; // Exit the function if the date is invalid
+  }
+
+  // Format the date object to be in the correct format (timestamp)
+  const formattedDeadline = dateObject.toISOString();
+  const result = await sql`INSERT INTO todos (title, description, deadline, L_id) VALUES (${title}, ${description}, ${formattedDeadline}, ${l_id});`;
   console.log(result);
   return result;
 }
@@ -531,20 +537,42 @@ app.post('/create', async (req, res) => {
   let description = req.body.description;
   let deadline = req.body.deadline;
   let l_id = lawyer.id;
-  let junior_id = parseInt(req.body.junior_ids);
-
+  
   let result = await createTodo(title, description, deadline, l_id);
 
+  res.send("TODO CREATED");
   if(result.length == 0) {
-    res.write({"word": "todo created"});
-
-    let todo_id = await fetchTodoId(title, description, deadline, l_id);
-
-    await assignTodoToLawyers(todo_id, junior_id);
-    res.end();
+    res.send({"word": "Todo created"});
   }
   else {
-    res.send({"word": "todo creation failed"});
+    res.send({"word": "Todo creation failed"});
+  }
+});
+
+// assing a todo to lawyers
+app.post('/assign', async (req, res) => {
+  let title = req.body.title;
+  let description = req.body.description;
+
+  let junior_id = parseInt(req.body.junior_id);
+  let todo_id = await fetchTodoId(title, description, deadline, l_id);
+
+  await assignTodoToLawyers(todo_id, junior_id);
+  res.send({"word": "todo assigned successfully"});
+});
+
+// get juniors
+app.get('/juniors', async (req, res) => {
+  let result = await sql`
+    SELECT *
+    FROM lawyer
+    WHERE sup_id = ${lawyer.id}
+  `;
+
+  if (result.length > 0) {
+    res.send({"user": result});
+  } else {
+    res.send({"word": "no juniors"});
   }
 });
 
