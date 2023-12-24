@@ -527,6 +527,7 @@ app.post('/create', async (req, res) => {
   let l_id = lawyer.id;
   let junior_id = req.body.junior_id;
 
+  console.log(req.body);
   console.log(deadline);
   
   let result = await createTodo(title, description, deadline, l_id);
